@@ -16,6 +16,7 @@
 - [ ] **Add Custom Category Dialog**: Category page needs a working form dialog to create custom categories with name, icon picker, and color picker
 - [ ] **Recurring expense automation**: The `isRecurring` flag exists on expenses but no scheduler or automation copies recurring expenses to new periods
 - [x] **Show category name on pie chart hover**: When hovering/touching a category in the spending pie chart, show the category name as a tooltip
+- [ ] **Open expense detail from person debt page**: When viewing a person's debt detail and tapping on an individual expense, it should navigate to the Add/Edit Expense page with that transaction's details — currently tapping does nothing
 
 ## Low Priority
 
