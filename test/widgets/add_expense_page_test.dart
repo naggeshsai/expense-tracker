@@ -13,7 +13,12 @@ import 'package:expense_tracker/presentation/blocs/expense/expense_event.dart';
 import 'package:expense_tracker/presentation/blocs/expense/expense_state.dart';
 import 'package:expense_tracker/presentation/blocs/category/category_cubit.dart';
 import 'package:expense_tracker/presentation/blocs/category/category_state.dart';
+import 'package:expense_tracker/presentation/blocs/settings/settings_cubit.dart';
+import 'package:expense_tracker/presentation/blocs/settings/settings_state.dart';
 import 'package:expense_tracker/presentation/pages/add_expense_page.dart';
+
+class MockSettingsCubit extends MockCubit<SettingsState>
+    implements SettingsCubit {}
 
 // Mock use cases
 class MockGetAllExpensesUseCase extends Mock implements GetAllExpensesUseCase {}
@@ -45,6 +50,7 @@ class MockSeedDefaultCategoriesUseCase extends Mock
 void main() {
   late ExpenseBloc expenseBloc;
   late CategoryCubit categoryCubit;
+  late MockSettingsCubit settingsCubit;
 
   final sl = GetIt.instance;
 
@@ -123,6 +129,11 @@ void main() {
     // Register ExpenseBloc as singleton in GetIt (mirrors production setup)
     sl.registerLazySingleton<ExpenseBloc>(() => expenseBloc);
     sl.registerFactory<CategoryCubit>(() => categoryCubit);
+
+    // Setup SettingsCubit mock with default USD state
+    settingsCubit = MockSettingsCubit();
+    when(() => settingsCubit.state).thenReturn(const SettingsState());
+    sl.registerLazySingleton<SettingsCubit>(() => settingsCubit);
   });
 
   tearDown(() async {
@@ -130,8 +141,11 @@ void main() {
   });
 
   Widget createTestWidget({Expense? expense}) {
-    return MaterialApp(
-      home: AddExpensePage(expense: expense),
+    return BlocProvider<SettingsCubit>.value(
+      value: settingsCubit,
+      child: MaterialApp(
+        home: AddExpensePage(expense: expense),
+      ),
     );
   }
 

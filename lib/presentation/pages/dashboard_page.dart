@@ -4,6 +4,8 @@ import '../blocs/dashboard/dashboard_cubit.dart';
 import '../blocs/dashboard/dashboard_state.dart';
 import '../blocs/category/category_cubit.dart';
 import '../blocs/category/category_state.dart';
+import '../blocs/settings/settings_cubit.dart';
+import '../blocs/settings/settings_state.dart';
 import '../widgets/summary_card.dart';
 import '../widgets/spending_pie_chart.dart';
 import '../widgets/date_range_selector.dart';
@@ -46,6 +48,10 @@ class DashboardPage extends StatelessWidget {
                     ? categoryState.categories
                     : [];
 
+                return BlocBuilder<SettingsCubit, SettingsState>(
+                  builder: (context, settingsState) {
+                    final currencySymbol = settingsState.currencySymbol;
+
                 return RefreshIndicator(
                   onRefresh: () async {
                     await context.read<DashboardCubit>().loadDashboardData();
@@ -66,7 +72,7 @@ class DashboardPage extends StatelessWidget {
                       // Total Spending Summary
                       SummaryCard(
                         title: 'Total Spending',
-                        value: CurrencyFormatter.format(dashboardState.totalSpending),
+                        value: CurrencyFormatter.format(dashboardState.totalSpending, symbol: currencySymbol),
                         icon: Icons.account_balance_wallet,
                         color: Colors.blue,
                       ),
@@ -108,9 +114,12 @@ class DashboardPage extends StatelessWidget {
                           dashboardState.categorySpending,
                           categories,
                           context,
+                          currencySymbol,
                         ),
                     ],
                   ),
+                );
+                  },
                 );
               },
             );
@@ -149,6 +158,7 @@ class DashboardPage extends StatelessWidget {
     Map<String, double> spending,
     List<dynamic> categories,
     BuildContext context,
+    String currencySymbol,
   ) {
     final sortedEntries = spending.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
@@ -178,7 +188,7 @@ class DashboardPage extends StatelessWidget {
           ),
           title: Text(category.name),
           trailing: Text(
-            CurrencyFormatter.format(entry.value),
+            CurrencyFormatter.format(entry.value, symbol: currencySymbol),
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),

@@ -5,6 +5,8 @@ import '../blocs/expense/expense_bloc.dart';
 import '../blocs/expense/expense_event.dart';
 import '../blocs/category/category_cubit.dart';
 import '../blocs/category/category_state.dart';
+import '../blocs/settings/settings_cubit.dart';
+import '../blocs/settings/settings_state.dart';
 import '../../domain/entities/expense.dart';
 import '../../core/constants/app_constants.dart';
 import '../../injection_container.dart';
@@ -85,22 +87,26 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       // Amount Field
-                      TextFormField(
-                        controller: _amountController,
-                        decoration: const InputDecoration(
-                          labelText: 'Amount',
-                          prefixText: '\$ ',
-                          hintText: '0.00',
-                        ),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter an amount';
-                          }
-                          if (double.tryParse(value) == null) {
-                            return 'Please enter a valid number';
-                          }
-                          return null;
+                      BlocBuilder<SettingsCubit, SettingsState>(
+                        builder: (context, settingsState) {
+                          return TextFormField(
+                            controller: _amountController,
+                            decoration: InputDecoration(
+                              labelText: 'Amount',
+                              prefixText: '${settingsState.currencySymbol} ',
+                              hintText: '0.00',
+                            ),
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter an amount';
+                              }
+                              if (double.tryParse(value) == null) {
+                                return 'Please enter a valid number';
+                              }
+                              return null;
+                            },
+                          );
                         },
                       ),
                       const SizedBox(height: 16),

@@ -4,12 +4,14 @@ class BudgetProgressBar extends StatelessWidget {
   final double spent;
   final double budget;
   final String categoryName;
+  final String currencySymbol;
 
   const BudgetProgressBar({
     super.key,
     required this.spent,
     required this.budget,
     required this.categoryName,
+    this.currencySymbol = '\$',
   });
 
   @override
@@ -40,7 +42,7 @@ class BudgetProgressBar extends StatelessWidget {
                       ),
                 ),
                 Text(
-                  '\$${spent.toStringAsFixed(2)} / \$${budget.toStringAsFixed(2)}',
+                  '$currencySymbol${spent.toStringAsFixed(2)} / $currencySymbol${budget.toStringAsFixed(2)}',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],

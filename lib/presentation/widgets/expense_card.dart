@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../domain/entities/expense.dart';
 import '../../domain/entities/category.dart';
 import '../../core/utils/currency_formatter.dart';
+import '../blocs/settings/settings_cubit.dart';
+import '../blocs/settings/settings_state.dart';
 
 class ExpenseCard extends StatelessWidget {
   final Expense expense;
@@ -83,12 +86,16 @@ class ExpenseCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
-                    CurrencyFormatter.format(expense.amount),
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.primary,
-                    ),
+                  BlocBuilder<SettingsCubit, SettingsState>(
+                    builder: (context, settingsState) {
+                      return Text(
+                        CurrencyFormatter.format(expense.amount, symbol: settingsState.currencySymbol),
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.primary,
+                        ),
+                      );
+                    },
                   ),
                   if (onDelete != null)
                     IconButton(

@@ -443,3 +443,53 @@ Use `Builder` for a child context, or access singletons via the service locator
 directly to avoid `ProviderNotFoundException` in callbacks like `onPressed`.
 
 **Platforms Verified**: Android (APK), Web, Windows — all build successfully.
+
+---
+
+### Fix: Currency Symbol Not Propagating Across Pages (Feb 2026)
+
+**Problem**: Changing the currency in Settings (e.g., from USD/$  to EUR/€) did not
+update the currency symbol anywhere else in the app — all pages/widgets continued
+to display `$`.
+
+**Root Cause**: The `CurrencyFormatter.format()` method has a default `symbol: '\$'`
+parameter, and all callers used the default without passing the active currency
+symbol from `SettingsState`. Additionally, `BudgetProgressBar` and `AddExpensePage`
+hardcoded `$` directly in string interpolation and `InputDecoration.prefixText`.
+
+**Fix — 5 files changed**:
+
+1. **`lib/presentation/widgets/expense_card.dart`**
+   - Wrapped the amount `Text` widget in `BlocBuilder<SettingsCubit, SettingsState>`
+   - Passes `settingsState.currencySymbol` to `CurrencyFormatter.format()`
+
+2. **`lib/presentation/widgets/budget_progress_bar.dart`**
+   - Added `currencySymbol` parameter (defaults to `'\$'` for backward compatibility)
+   - Replaced hardcoded `'\$${spent}...'` with `'$currencySymbol${spent}...'`
+
+3. **`lib/presentation/pages/add_expense_page.dart`**
+   - Wrapped the amount `TextFormField` in `BlocBuilder<SettingsCubit, SettingsState>`
+   - Changed `prefixText: '\$ '` to `prefixText: '${settingsState.currencySymbol} '`
+
+4. **`lib/presentation/pages/dashboard_page.dart`**
+   - Added `BlocBuilder<SettingsCubit, SettingsState>` inside the category builder
+   - Passes `currencySymbol` to `CurrencyFormatter.format()` for total spending
+     and per-category amounts in `_buildCategoryList()`
+
+5. **`lib/presentation/pages/budget_page.dart`**
+   - Wrapped `BudgetProgressBar` in `BlocBuilder<SettingsCubit, SettingsState>`
+   - Passes `settingsState.currencySymbol` to the `currencySymbol` parameter
+
+**How it works**: `SettingsCubit` is provided at the app root via `BlocProvider.value`
+in `app.dart`. When the user changes currency in Settings, `SettingsCubit.setCurrency()`
+persists to SharedPreferences and emits a new `SettingsState` with the updated
+`currencySymbol`. Every `BlocBuilder<SettingsCubit, SettingsState>` across the app
+rebuilds automatically, passing the new symbol to formatters and display strings.
+
+**Test Added**: `test/widgets/currency_propagation_test.dart` — 12 tests:
+- `CurrencyFormatter` unit tests: formats with $, €, ₹, and £ (compact)
+- `BudgetProgressBar` widget tests: default $, euro €, rupee ₹
+- `ExpenseCard` widget tests: default $, euro €, reactive update (stream)
+- `AddExpensePage` widget tests: default $ prefix, EUR € prefix
+
+**Platforms Verified**: Android (APK), Web, Windows — all build successfully.

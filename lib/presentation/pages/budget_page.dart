@@ -5,6 +5,8 @@ import '../blocs/budget/budget_state.dart';
 import '../blocs/category/category_cubit.dart';
 import '../blocs/category/category_state.dart';
 import '../blocs/dashboard/dashboard_cubit.dart';
+import '../blocs/settings/settings_cubit.dart';
+import '../blocs/settings/settings_state.dart';
 import '../widgets/budget_progress_bar.dart';
 import '../../injection_container.dart';
 
@@ -92,10 +94,15 @@ class BudgetPage extends StatelessWidget {
                       // For now, using mock data
                       final spent = budget.amount * 0.7;
 
-                      return BudgetProgressBar(
-                        spent: spent,
-                        budget: budget.amount,
-                        categoryName: categoryName,
+                      return BlocBuilder<SettingsCubit, SettingsState>(
+                        builder: (context, settingsState) {
+                          return BudgetProgressBar(
+                            spent: spent,
+                            budget: budget.amount,
+                            categoryName: categoryName,
+                            currencySymbol: settingsState.currencySymbol,
+                          );
+                        },
                       );
                     },
                   );
