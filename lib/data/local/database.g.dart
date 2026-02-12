@@ -50,6 +50,22 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'CHECK ("is_recurring" IN (0, 1))'),
       defaultValue: const Constant(false));
+  static const VerificationMeta _isForOtherMeta =
+      const VerificationMeta('isForOther');
+  @override
+  late final GeneratedColumn<bool> isForOther = GeneratedColumn<bool>(
+      'is_for_other', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("is_for_other" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _paidForPersonMeta =
+      const VerificationMeta('paidForPerson');
+  @override
+  late final GeneratedColumn<String> paidForPerson = GeneratedColumn<String>(
+      'paid_for_person', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -81,6 +97,8 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
         date,
         paymentMethod,
         isRecurring,
+        isForOther,
+        paidForPerson,
         createdAt,
         updatedAt,
         isSynced
@@ -138,6 +156,18 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
           isRecurring.isAcceptableOrUnknown(
               data['is_recurring']!, _isRecurringMeta));
     }
+    if (data.containsKey('is_for_other')) {
+      context.handle(
+          _isForOtherMeta,
+          isForOther.isAcceptableOrUnknown(
+              data['is_for_other']!, _isForOtherMeta));
+    }
+    if (data.containsKey('paid_for_person')) {
+      context.handle(
+          _paidForPersonMeta,
+          paidForPerson.isAcceptableOrUnknown(
+              data['paid_for_person']!, _paidForPersonMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -177,6 +207,10 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
           .read(DriftSqlType.string, data['${effectivePrefix}payment_method'])!,
       isRecurring: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_recurring'])!,
+      isForOther: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_for_other'])!,
+      paidForPerson: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}paid_for_person']),
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -200,6 +234,8 @@ class Expense extends DataClass implements Insertable<Expense> {
   final DateTime date;
   final String paymentMethod;
   final bool isRecurring;
+  final bool isForOther;
+  final String? paidForPerson;
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isSynced;
@@ -211,6 +247,8 @@ class Expense extends DataClass implements Insertable<Expense> {
       required this.date,
       required this.paymentMethod,
       required this.isRecurring,
+      required this.isForOther,
+      this.paidForPerson,
       required this.createdAt,
       required this.updatedAt,
       required this.isSynced});
@@ -226,6 +264,10 @@ class Expense extends DataClass implements Insertable<Expense> {
     map['date'] = Variable<DateTime>(date);
     map['payment_method'] = Variable<String>(paymentMethod);
     map['is_recurring'] = Variable<bool>(isRecurring);
+    map['is_for_other'] = Variable<bool>(isForOther);
+    if (!nullToAbsent || paidForPerson != null) {
+      map['paid_for_person'] = Variable<String>(paidForPerson);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     map['is_synced'] = Variable<bool>(isSynced);
@@ -241,6 +283,10 @@ class Expense extends DataClass implements Insertable<Expense> {
       date: Value(date),
       paymentMethod: Value(paymentMethod),
       isRecurring: Value(isRecurring),
+      isForOther: Value(isForOther),
+      paidForPerson: paidForPerson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paidForPerson),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       isSynced: Value(isSynced),
@@ -258,6 +304,8 @@ class Expense extends DataClass implements Insertable<Expense> {
       date: serializer.fromJson<DateTime>(json['date']),
       paymentMethod: serializer.fromJson<String>(json['paymentMethod']),
       isRecurring: serializer.fromJson<bool>(json['isRecurring']),
+      isForOther: serializer.fromJson<bool>(json['isForOther']),
+      paidForPerson: serializer.fromJson<String?>(json['paidForPerson']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       isSynced: serializer.fromJson<bool>(json['isSynced']),
@@ -274,6 +322,8 @@ class Expense extends DataClass implements Insertable<Expense> {
       'date': serializer.toJson<DateTime>(date),
       'paymentMethod': serializer.toJson<String>(paymentMethod),
       'isRecurring': serializer.toJson<bool>(isRecurring),
+      'isForOther': serializer.toJson<bool>(isForOther),
+      'paidForPerson': serializer.toJson<String?>(paidForPerson),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'isSynced': serializer.toJson<bool>(isSynced),
@@ -288,6 +338,8 @@ class Expense extends DataClass implements Insertable<Expense> {
           DateTime? date,
           String? paymentMethod,
           bool? isRecurring,
+          bool? isForOther,
+          Value<String?> paidForPerson = const Value.absent(),
           DateTime? createdAt,
           DateTime? updatedAt,
           bool? isSynced}) =>
@@ -299,6 +351,9 @@ class Expense extends DataClass implements Insertable<Expense> {
         date: date ?? this.date,
         paymentMethod: paymentMethod ?? this.paymentMethod,
         isRecurring: isRecurring ?? this.isRecurring,
+        isForOther: isForOther ?? this.isForOther,
+        paidForPerson:
+            paidForPerson.present ? paidForPerson.value : this.paidForPerson,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         isSynced: isSynced ?? this.isSynced,
@@ -316,6 +371,11 @@ class Expense extends DataClass implements Insertable<Expense> {
           : this.paymentMethod,
       isRecurring:
           data.isRecurring.present ? data.isRecurring.value : this.isRecurring,
+      isForOther:
+          data.isForOther.present ? data.isForOther.value : this.isForOther,
+      paidForPerson: data.paidForPerson.present
+          ? data.paidForPerson.value
+          : this.paidForPerson,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
@@ -332,6 +392,8 @@ class Expense extends DataClass implements Insertable<Expense> {
           ..write('date: $date, ')
           ..write('paymentMethod: $paymentMethod, ')
           ..write('isRecurring: $isRecurring, ')
+          ..write('isForOther: $isForOther, ')
+          ..write('paidForPerson: $paidForPerson, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('isSynced: $isSynced')
@@ -340,8 +402,19 @@ class Expense extends DataClass implements Insertable<Expense> {
   }
 
   @override
-  int get hashCode => Object.hash(id, amount, categoryId, note, date,
-      paymentMethod, isRecurring, createdAt, updatedAt, isSynced);
+  int get hashCode => Object.hash(
+      id,
+      amount,
+      categoryId,
+      note,
+      date,
+      paymentMethod,
+      isRecurring,
+      isForOther,
+      paidForPerson,
+      createdAt,
+      updatedAt,
+      isSynced);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -353,6 +426,8 @@ class Expense extends DataClass implements Insertable<Expense> {
           other.date == this.date &&
           other.paymentMethod == this.paymentMethod &&
           other.isRecurring == this.isRecurring &&
+          other.isForOther == this.isForOther &&
+          other.paidForPerson == this.paidForPerson &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.isSynced == this.isSynced);
@@ -366,6 +441,8 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
   final Value<DateTime> date;
   final Value<String> paymentMethod;
   final Value<bool> isRecurring;
+  final Value<bool> isForOther;
+  final Value<String?> paidForPerson;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<bool> isSynced;
@@ -378,6 +455,8 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     this.date = const Value.absent(),
     this.paymentMethod = const Value.absent(),
     this.isRecurring = const Value.absent(),
+    this.isForOther = const Value.absent(),
+    this.paidForPerson = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.isSynced = const Value.absent(),
@@ -391,6 +470,8 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     required DateTime date,
     required String paymentMethod,
     this.isRecurring = const Value.absent(),
+    this.isForOther = const Value.absent(),
+    this.paidForPerson = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.isSynced = const Value.absent(),
@@ -410,6 +491,8 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     Expression<DateTime>? date,
     Expression<String>? paymentMethod,
     Expression<bool>? isRecurring,
+    Expression<bool>? isForOther,
+    Expression<String>? paidForPerson,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<bool>? isSynced,
@@ -423,6 +506,8 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
       if (date != null) 'date': date,
       if (paymentMethod != null) 'payment_method': paymentMethod,
       if (isRecurring != null) 'is_recurring': isRecurring,
+      if (isForOther != null) 'is_for_other': isForOther,
+      if (paidForPerson != null) 'paid_for_person': paidForPerson,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (isSynced != null) 'is_synced': isSynced,
@@ -438,6 +523,8 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
       Value<DateTime>? date,
       Value<String>? paymentMethod,
       Value<bool>? isRecurring,
+      Value<bool>? isForOther,
+      Value<String?>? paidForPerson,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt,
       Value<bool>? isSynced,
@@ -450,6 +537,8 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
       date: date ?? this.date,
       paymentMethod: paymentMethod ?? this.paymentMethod,
       isRecurring: isRecurring ?? this.isRecurring,
+      isForOther: isForOther ?? this.isForOther,
+      paidForPerson: paidForPerson ?? this.paidForPerson,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isSynced: isSynced ?? this.isSynced,
@@ -481,6 +570,12 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     if (isRecurring.present) {
       map['is_recurring'] = Variable<bool>(isRecurring.value);
     }
+    if (isForOther.present) {
+      map['is_for_other'] = Variable<bool>(isForOther.value);
+    }
+    if (paidForPerson.present) {
+      map['paid_for_person'] = Variable<String>(paidForPerson.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -506,6 +601,8 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
           ..write('date: $date, ')
           ..write('paymentMethod: $paymentMethod, ')
           ..write('isRecurring: $isRecurring, ')
+          ..write('isForOther: $isForOther, ')
+          ..write('paidForPerson: $paidForPerson, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('isSynced: $isSynced, ')
@@ -1265,6 +1362,8 @@ typedef $$ExpensesTableCreateCompanionBuilder = ExpensesCompanion Function({
   required DateTime date,
   required String paymentMethod,
   Value<bool> isRecurring,
+  Value<bool> isForOther,
+  Value<String?> paidForPerson,
   required DateTime createdAt,
   required DateTime updatedAt,
   Value<bool> isSynced,
@@ -1278,6 +1377,8 @@ typedef $$ExpensesTableUpdateCompanionBuilder = ExpensesCompanion Function({
   Value<DateTime> date,
   Value<String> paymentMethod,
   Value<bool> isRecurring,
+  Value<bool> isForOther,
+  Value<String?> paidForPerson,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
   Value<bool> isSynced,
@@ -1313,6 +1414,12 @@ class $$ExpensesTableFilterComposer
 
   ColumnFilters<bool> get isRecurring => $composableBuilder(
       column: $table.isRecurring, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isForOther => $composableBuilder(
+      column: $table.isForOther, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get paidForPerson => $composableBuilder(
+      column: $table.paidForPerson, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
@@ -1355,6 +1462,13 @@ class $$ExpensesTableOrderingComposer
   ColumnOrderings<bool> get isRecurring => $composableBuilder(
       column: $table.isRecurring, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<bool> get isForOther => $composableBuilder(
+      column: $table.isForOther, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get paidForPerson => $composableBuilder(
+      column: $table.paidForPerson,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
@@ -1394,6 +1508,12 @@ class $$ExpensesTableAnnotationComposer
 
   GeneratedColumn<bool> get isRecurring => $composableBuilder(
       column: $table.isRecurring, builder: (column) => column);
+
+  GeneratedColumn<bool> get isForOther => $composableBuilder(
+      column: $table.isForOther, builder: (column) => column);
+
+  GeneratedColumn<String> get paidForPerson => $composableBuilder(
+      column: $table.paidForPerson, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -1435,6 +1555,8 @@ class $$ExpensesTableTableManager extends RootTableManager<
             Value<DateTime> date = const Value.absent(),
             Value<String> paymentMethod = const Value.absent(),
             Value<bool> isRecurring = const Value.absent(),
+            Value<bool> isForOther = const Value.absent(),
+            Value<String?> paidForPerson = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<bool> isSynced = const Value.absent(),
@@ -1448,6 +1570,8 @@ class $$ExpensesTableTableManager extends RootTableManager<
             date: date,
             paymentMethod: paymentMethod,
             isRecurring: isRecurring,
+            isForOther: isForOther,
+            paidForPerson: paidForPerson,
             createdAt: createdAt,
             updatedAt: updatedAt,
             isSynced: isSynced,
@@ -1461,6 +1585,8 @@ class $$ExpensesTableTableManager extends RootTableManager<
             required DateTime date,
             required String paymentMethod,
             Value<bool> isRecurring = const Value.absent(),
+            Value<bool> isForOther = const Value.absent(),
+            Value<String?> paidForPerson = const Value.absent(),
             required DateTime createdAt,
             required DateTime updatedAt,
             Value<bool> isSynced = const Value.absent(),
@@ -1474,6 +1600,8 @@ class $$ExpensesTableTableManager extends RootTableManager<
             date: date,
             paymentMethod: paymentMethod,
             isRecurring: isRecurring,
+            isForOther: isForOther,
+            paidForPerson: paidForPerson,
             createdAt: createdAt,
             updatedAt: updatedAt,
             isSynced: isSynced,

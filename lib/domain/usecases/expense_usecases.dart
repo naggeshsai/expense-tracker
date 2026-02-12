@@ -52,3 +52,22 @@ class GetCategorySpendingUseCase {
   Future<Map<String, double>> call(DateTime start, DateTime end) =>
       repository.getCategorySpending(start, end);
 }
+
+class GetExpensesForOthersUseCase {
+  final ExpenseRepository repository;
+  GetExpensesForOthersUseCase(this.repository);
+  Future<List<Expense>> call() => repository.getExpensesForOthers();
+}
+
+class GetExpensesByPersonUseCase {
+  final ExpenseRepository repository;
+  GetExpensesByPersonUseCase(this.repository);
+  Future<List<Expense>> call(String personName) =>
+      repository.getExpensesByPerson(personName);
+}
+
+class GetDebtsByPersonUseCase {
+  final ExpenseRepository repository;
+  GetDebtsByPersonUseCase(this.repository);
+  Future<Map<String, double>> call() => repository.getDebtsByPerson();
+}

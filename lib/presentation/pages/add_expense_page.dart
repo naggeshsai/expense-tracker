@@ -24,11 +24,13 @@ class _AddExpensePageState extends State<AddExpensePage> {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _noteController = TextEditingController();
+  final _paidForPersonController = TextEditingController();
   
   String? _selectedCategoryId;
   String _selectedPaymentMethod = 'Cash';
   DateTime _selectedDate = DateTime.now();
   bool _isRecurring = false;
+  bool _isForOther = false;
 
   @override
   void initState() {
@@ -40,6 +42,8 @@ class _AddExpensePageState extends State<AddExpensePage> {
       _selectedPaymentMethod = widget.expense!.paymentMethod;
       _selectedDate = widget.expense!.date;
       _isRecurring = widget.expense!.isRecurring;
+      _isForOther = widget.expense!.isForOther;
+      _paidForPersonController.text = widget.expense!.paidForPerson ?? '';
     }
   }
 
@@ -47,6 +51,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   void dispose() {
     _amountController.dispose();
     _noteController.dispose();
+    _paidForPersonController.dispose();
     super.dispose();
   }
 
@@ -212,6 +217,43 @@ class _AddExpensePageState extends State<AddExpensePage> {
                           });
                         },
                       ),
+                      const SizedBox(height: 8),
+
+                      // Paid for someone else
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Paid for someone else'),
+                        subtitle: const Text('Track who owes you'),
+                        value: _isForOther,
+                        onChanged: (value) {
+                          setState(() {
+                            _isForOther = value;
+                            if (!value) {
+                              _paidForPersonController.clear();
+                            }
+                          });
+                        },
+                      ),
+
+                      // Person Name Field (shown when isForOther is true)
+                      if (_isForOther) ...[
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _paidForPersonController,
+                          decoration: const InputDecoration(
+                            labelText: 'Person Name',
+                            hintText: 'Who is this expense for?',
+                            prefixIcon: Icon(Icons.person),
+                          ),
+                          textCapitalization: TextCapitalization.words,
+                          validator: (value) {
+                            if (_isForOther && (value == null || value.trim().isEmpty)) {
+                              return 'Please enter the person\'s name';
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
                       const SizedBox(height: 24),
 
                       // Save Button
@@ -242,6 +284,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
     if (_formKey.currentState!.validate()) {
       final amount = double.parse(_amountController.text);
       final note = _noteController.text.trim();
+      final personName = _paidForPersonController.text.trim();
       final now = DateTime.now().toUtc();
 
       final expense = Expense(
@@ -252,6 +295,8 @@ class _AddExpensePageState extends State<AddExpensePage> {
         date: _selectedDate,
         paymentMethod: _selectedPaymentMethod,
         isRecurring: _isRecurring,
+        isForOther: _isForOther,
+        paidForPerson: _isForOther && personName.isNotEmpty ? personName : null,
         createdAt: widget.expense?.createdAt ?? now,
         updatedAt: now,
         isSynced: false,

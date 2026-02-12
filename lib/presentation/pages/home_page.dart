@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dashboard_page.dart';
 import 'expense_list_page.dart';
 import 'budget_page.dart';
+import 'debts_page.dart';
 import 'settings_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -18,6 +19,7 @@ class _HomePageState extends State<HomePage> {
     DashboardPage(),
     ExpenseListPage(),
     BudgetPage(),
+    DebtsPage(),
     SettingsPage(),
   ];
 
@@ -47,6 +49,11 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.account_balance_wallet_outlined),
             selectedIcon: Icon(Icons.account_balance_wallet),
             label: 'Budget',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.people_outlined),
+            selectedIcon: Icon(Icons.people),
+            label: 'Debts',
           ),
           NavigationDestination(
             icon: Icon(Icons.settings_outlined),

@@ -134,5 +134,176 @@ void main() {
         ExpenseLoaded([]),
       ],
     );
+
+    blocTest<ExpenseBloc, ExpenseState>(
+      'emits [ExpenseOperationSuccess, ExpenseLoading, ExpenseLoaded] when UpdateExpense is successful',
+      build: () {
+        final updatedExpense = Expense(
+          id: '1',
+          amount: 200.0,
+          categoryId: 'cat1',
+          date: DateTime(2024, 6, 15),
+          paymentMethod: 'Card',
+          isRecurring: false,
+          createdAt: DateTime(2024, 6, 15),
+          updatedAt: DateTime(2024, 6, 15),
+          isSynced: false,
+        );
+        when(() => mockUpdateExpenseUseCase(any())).thenAnswer((_) async {});
+        when(() => mockGetAllExpensesUseCase()).thenAnswer((_) async => [updatedExpense]);
+        return expenseBloc;
+      },
+      act: (bloc) => bloc.add(UpdateExpense(testExpense)),
+      expect: () => [
+        ExpenseOperationSuccess('Expense updated successfully'),
+        ExpenseLoading(),
+        isA<ExpenseLoaded>(),
+      ],
+    );
+
+    blocTest<ExpenseBloc, ExpenseState>(
+      'emits [ExpenseLoading, ExpenseLoaded] when LoadExpensesByDateRange is successful',
+      build: () {
+        when(() => mockGetExpensesByDateRangeUseCase(any(), any()))
+            .thenAnswer((_) async => [testExpense]);
+        return expenseBloc;
+      },
+      act: (bloc) => bloc.add(LoadExpensesByDateRange(
+        DateTime(2024, 1, 1),
+        DateTime(2024, 12, 31),
+      )),
+      expect: () => [
+        ExpenseLoading(),
+        ExpenseLoaded([testExpense]),
+      ],
+    );
+
+    blocTest<ExpenseBloc, ExpenseState>(
+      'emits [ExpenseLoading, ExpenseError] when LoadExpensesByDateRange fails',
+      build: () {
+        when(() => mockGetExpensesByDateRangeUseCase(any(), any()))
+            .thenThrow(Exception('Date range error'));
+        return expenseBloc;
+      },
+      act: (bloc) => bloc.add(LoadExpensesByDateRange(
+        DateTime(2024, 1, 1),
+        DateTime(2024, 12, 31),
+      )),
+      expect: () => [
+        ExpenseLoading(),
+        isA<ExpenseError>(),
+      ],
+    );
+
+    blocTest<ExpenseBloc, ExpenseState>(
+      'emits [ExpenseLoading, ExpenseLoaded] when LoadExpensesByCategory is successful',
+      build: () {
+        when(() => mockGetExpensesByCategoryUseCase(any()))
+            .thenAnswer((_) async => [testExpense]);
+        return expenseBloc;
+      },
+      act: (bloc) => bloc.add(LoadExpensesByCategory('cat1')),
+      expect: () => [
+        ExpenseLoading(),
+        ExpenseLoaded([testExpense]),
+      ],
+    );
+
+    blocTest<ExpenseBloc, ExpenseState>(
+      'emits [ExpenseLoading, ExpenseError] when LoadExpensesByCategory fails',
+      build: () {
+        when(() => mockGetExpensesByCategoryUseCase(any()))
+            .thenThrow(Exception('Category error'));
+        return expenseBloc;
+      },
+      act: (bloc) => bloc.add(LoadExpensesByCategory('cat1')),
+      expect: () => [
+        ExpenseLoading(),
+        isA<ExpenseError>(),
+      ],
+    );
+
+    blocTest<ExpenseBloc, ExpenseState>(
+      'emits [ExpenseError] when AddExpense fails',
+      build: () {
+        when(() => mockAddExpenseUseCase(any()))
+            .thenThrow(Exception('Add failed'));
+        return expenseBloc;
+      },
+      act: (bloc) => bloc.add(AddExpense(testExpense)),
+      expect: () => [
+        isA<ExpenseError>(),
+      ],
+    );
+
+    blocTest<ExpenseBloc, ExpenseState>(
+      'emits [ExpenseError] when UpdateExpense fails',
+      build: () {
+        when(() => mockUpdateExpenseUseCase(any()))
+            .thenThrow(Exception('Update failed'));
+        return expenseBloc;
+      },
+      act: (bloc) => bloc.add(UpdateExpense(testExpense)),
+      expect: () => [
+        isA<ExpenseError>(),
+      ],
+    );
+
+    blocTest<ExpenseBloc, ExpenseState>(
+      'emits [ExpenseError] when DeleteExpense fails',
+      build: () {
+        when(() => mockDeleteExpenseUseCase(any()))
+            .thenThrow(Exception('Delete failed'));
+        return expenseBloc;
+      },
+      act: (bloc) => bloc.add(DeleteExpense('1')),
+      expect: () => [
+        isA<ExpenseError>(),
+      ],
+    );
+
+    blocTest<ExpenseBloc, ExpenseState>(
+      'can add expense with isForOther fields set',
+      build: () {
+        final debtExpense = Expense(
+          id: '2',
+          amount: 50.0,
+          categoryId: 'cat1',
+          date: DateTime(2024, 6, 15),
+          paymentMethod: 'Cash',
+          isRecurring: false,
+          isForOther: true,
+          paidForPerson: 'Alice',
+          createdAt: DateTime(2024, 6, 15),
+          updatedAt: DateTime(2024, 6, 15),
+          isSynced: false,
+        );
+        when(() => mockAddExpenseUseCase(any())).thenAnswer((_) async {});
+        when(() => mockGetAllExpensesUseCase()).thenAnswer((_) async => [debtExpense]);
+        return expenseBloc;
+      },
+      act: (bloc) => bloc.add(AddExpense(Expense(
+        id: '2',
+        amount: 50.0,
+        categoryId: 'cat1',
+        date: DateTime(2024, 6, 15),
+        paymentMethod: 'Cash',
+        isRecurring: false,
+        isForOther: true,
+        paidForPerson: 'Alice',
+        createdAt: DateTime(2024, 6, 15),
+        updatedAt: DateTime(2024, 6, 15),
+        isSynced: false,
+      ))),
+      expect: () => [
+        ExpenseOperationSuccess('Expense added successfully'),
+        ExpenseLoading(),
+        isA<ExpenseLoaded>().having(
+          (s) => s.expenses.first.isForOther,
+          'isForOther',
+          true,
+        ),
+      ],
+    );
   });
 }

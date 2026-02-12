@@ -11,4 +11,7 @@ abstract class ExpenseRepository {
   Future<void> deleteAllExpenses();
   Future<double> getTotalSpending(DateTime start, DateTime end);
   Future<Map<String, double>> getCategorySpending(DateTime start, DateTime end);
+  Future<List<Expense>> getExpensesForOthers();
+  Future<List<Expense>> getExpensesByPerson(String personName);
+  Future<Map<String, double>> getDebtsByPerson();
 }

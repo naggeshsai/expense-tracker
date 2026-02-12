@@ -230,5 +230,182 @@ void main() {
         expect(find.text('Expense updated successfully'), findsOneWidget);
       },
     );
+
+    testWidgets(
+      'shows "Paid for someone else" switch toggle',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Verify the switch is present
+        expect(find.text('Paid for someone else'), findsOneWidget);
+        expect(find.text('Track who owes you'), findsOneWidget);
+        expect(find.byType(SwitchListTile), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'person name field is hidden by default',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Person name field should NOT be visible
+        expect(find.text('Person Name'), findsNothing);
+        expect(find.text('Who is this expense for?'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'toggling switch shows person name field',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Scroll to make the switch visible then tap it
+        final switchTile = find.byType(SwitchListTile);
+        await tester.ensureVisible(switchTile);
+        await tester.pumpAndSettle();
+        await tester.tap(switchTile);
+        await tester.pumpAndSettle();
+
+        // Now the person name field should appear
+        expect(find.text('Person Name'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'person name is required when switch is on',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Enter amount
+        final amountField = find.byType(TextFormField).first;
+        await tester.enterText(amountField, '42.50');
+        await tester.pumpAndSettle();
+
+        // Enable "Paid for someone else"
+        final switchTile = find.byType(SwitchListTile);
+        await tester.ensureVisible(switchTile);
+        await tester.pumpAndSettle();
+        await tester.tap(switchTile);
+        await tester.pumpAndSettle();
+
+        // Try to save without entering person name
+        final saveButton =
+            find.widgetWithText(ElevatedButton, 'Add Expense');
+        await tester.ensureVisible(saveButton);
+        await tester.pumpAndSettle();
+        await tester.tap(saveButton);
+        await tester.pumpAndSettle();
+
+        // Validation error should appear
+        expect(find.text('Please enter the person\'s name'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'saves expense with debt fields when filled',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Enter amount
+        final amountField = find.byType(TextFormField).first;
+        await tester.enterText(amountField, '100.00');
+        await tester.pumpAndSettle();
+
+        // Enable "Paid for someone else"
+        final switchTile = find.byType(SwitchListTile);
+        await tester.ensureVisible(switchTile);
+        await tester.pumpAndSettle();
+        await tester.tap(switchTile);
+        await tester.pumpAndSettle();
+
+        // Enter person name
+        final personNameField = find.widgetWithText(TextFormField, 'Person Name');
+        await tester.enterText(personNameField, 'Alice');
+        await tester.pumpAndSettle();
+
+        // Scroll to save button and tap
+        final saveButton =
+            find.widgetWithText(ElevatedButton, 'Add Expense');
+        await tester.ensureVisible(saveButton);
+        await tester.pumpAndSettle();
+        await tester.tap(saveButton);
+        await tester.pump();
+
+        // Should save successfully (SnackBar appears)
+        expect(find.text('Expense added successfully'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'edit expense with debt fields pre-fills the form',
+      (WidgetTester tester) async {
+        final existingDebtExpense = Expense(
+          id: 'exp-debt1',
+          amount: 75.0,
+          categoryId: 'cat1',
+          date: DateTime(2024, 6, 15),
+          paymentMethod: 'Cash',
+          isRecurring: false,
+          isForOther: true,
+          paidForPerson: 'Bob',
+          createdAt: DateTime(2024, 6, 15),
+          updatedAt: DateTime(2024, 6, 15),
+          isSynced: false,
+        );
+
+        await tester
+            .pumpWidget(createTestWidget(expense: existingDebtExpense));
+        await tester.pumpAndSettle();
+
+        // The switch should be ON
+        final switchTile =
+            tester.widget<SwitchListTile>(find.byType(SwitchListTile));
+        expect(switchTile.value, true);
+
+        // Person name field should show "Bob"
+        expect(find.text('Bob'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'toggling switch off clears person name',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Enable "Paid for someone else"
+        final switchTileFinder = find.byType(SwitchListTile);
+        await tester.ensureVisible(switchTileFinder);
+        await tester.pumpAndSettle();
+        await tester.tap(switchTileFinder);
+        await tester.pumpAndSettle();
+
+        // Enter person name
+        final personNameField = find.widgetWithText(TextFormField, 'Person Name');
+        await tester.enterText(personNameField, 'Charlie');
+        await tester.pumpAndSettle();
+
+        // Toggle switch off
+        await tester.tap(switchTileFinder);
+        await tester.pumpAndSettle();
+
+        // Person name field should be hidden
+        expect(find.text('Person Name'), findsNothing);
+
+        // Toggle switch on again — the field should be empty
+        await tester.tap(switchTileFinder);
+        await tester.pumpAndSettle();
+
+        // The text should be cleared
+        final personField = tester.widget<TextFormField>(
+            find.widgetWithText(TextFormField, 'Person Name'));
+        expect(personField.controller!.text, isEmpty);
+      },
+    );
   });
 }

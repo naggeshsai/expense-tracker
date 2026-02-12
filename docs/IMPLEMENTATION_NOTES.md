@@ -493,3 +493,62 @@ rebuilds automatically, passing the new symbol to formatters and display strings
 - `AddExpensePage` widget tests: default $ prefix, EUR € prefix
 
 **Platforms Verified**: Android (APK), Web, Windows — all build successfully.
+
+---
+
+## Debt Tracking Feature — "Paid for Someone Else"
+
+### Overview
+Added the ability to mark an expense as paid on behalf of someone else, track who owes money, and view a debts overview page. This enables users to keep track of how much each person owes them.
+
+### Database Changes
+- **Schema version**: Bumped from 1 → 2
+- **New columns** in `Expenses` table:
+  - `isForOther` — `BoolColumn`, defaults to `false`
+  - `paidForPerson` — `TextColumn`, nullable
+- **Migration**: `onUpgrade` handler adds both columns for users upgrading from version 1
+
+### Domain Layer
+- **`Expense` entity**: Added `isForOther` (default `false`) and `paidForPerson` (nullable) fields, with backward-compatible defaults, `copyWith` support, and Equatable props
+- **`PersonDebt` entity** (new): Value object with `personName` and `totalOwed`, used in the debts overview
+- **`ExpenseRepository`**: Added 3 new abstract methods: `getExpensesForOthers()`, `getExpensesByPerson(String)`, `getDebtsByPerson()`
+- **New use cases**: `GetExpensesForOthersUseCase`, `GetExpensesByPersonUseCase`, `GetDebtsByPersonUseCase`
+
+### Data Layer
+- **`ExpenseDao`**: 3 new query methods:
+  - `getExpensesForOthers()` — all expenses where `isForOther == true`
+  - `getExpensesByPerson(String)` — expenses for a specific person
+  - `getDebtsByPerson()` — aggregated `SUM(amount) GROUP BY paidForPerson`
+- **`ExpenseRepositoryImpl`**: Implements the 3 new repository methods
+- **Mappers updated**: `ExpenseMapper` and `ExpenseEntityMapper` handle `isForOther` and `paidForPerson`
+
+### Presentation Layer
+- **`DebtCubit`** (new): Manages debt state with `loadDebts()` and `loadExpensesForPerson(String)` methods
+- **`DebtState`** (new): States — `DebtInitial`, `DebtLoading`, `DebtLoaded(List<PersonDebt>)`, `DebtPersonExpensesLoaded(personName, expenses, totalOwed)`, `DebtError`
+- **`AddExpensePage`**: Added `SwitchListTile` "Paid for someone else" with subtitle "Track who owes you". When toggled on, shows a `TextFormField` for person name with validation. Pre-fills when editing an existing debt expense. Clears person name when switch is toggled off.
+- **`DebtsPage`** (new): Overview page with gradient summary card (total owed + person count) and `ListView` of persons with colored avatars, amounts in red, and tap-to-drill-down navigation
+- **`PersonDebtDetailPage`** (new): Detail page showing all expenses paid for a specific person, with category icons and a header card showing total owed
+- **`HomePage`**: Now has 5 tabs — Dashboard, Expenses, Budget, **Debts** (people icon), Settings
+
+### DI Wiring
+- 3 new use cases registered as lazy singletons in `injection_container.dart`
+- `DebtCubit` registered as a factory
+
+### Tests Added (32 new tests, 65 total)
+- **`test/blocs/debt_cubit_test.dart`** — 10 tests:
+  - Initial state, loadDebts success/empty/error, sorted by totalOwed desc
+  - loadExpensesForPerson success/error, correct total calculation
+  - PersonDebt equality/props, Expense backward compat & debt fields
+- **`test/widgets/debts_page_test.dart`** — 8 tests:
+  - Empty state, loading state, person list, total owed card, singular/plural count
+  - Currency symbol from SettingsCubit, avatar letter, subtitle, error state
+- **`test/widgets/add_expense_page_test.dart`** — 7 new debt-related tests:
+  - Switch toggle, person name field visibility, validation, save with debt fields
+  - Edit pre-fill, toggling switch clears person name
+- **`test/blocs/expense_bloc_test.dart`** — 7 new tests for existing gaps:
+  - UpdateExpense, LoadByDateRange, LoadByCategory, error cases, debt expense add
+
+### Platforms Verified
+- **Web**: `flutter build web` ✅
+- **Windows**: `flutter build windows` ✅
+- **Android**: `flutter build apk` ✅

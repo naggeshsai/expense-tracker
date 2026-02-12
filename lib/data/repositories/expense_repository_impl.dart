@@ -61,4 +61,21 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   Future<Map<String, double>> getCategorySpending(DateTime start, DateTime end) async {
     return await _expenseDao.getCategorySpending(start, end);
   }
+
+  @override
+  Future<List<Expense>> getExpensesForOthers() async {
+    final expenses = await _expenseDao.getExpensesForOthers();
+    return expenses.map((e) => e.toEntity()).toList();
+  }
+
+  @override
+  Future<List<Expense>> getExpensesByPerson(String personName) async {
+    final expenses = await _expenseDao.getExpensesByPerson(personName);
+    return expenses.map((e) => e.toEntity()).toList();
+  }
+
+  @override
+  Future<Map<String, double>> getDebtsByPerson() async {
+    return await _expenseDao.getDebtsByPerson();
+  }
 }

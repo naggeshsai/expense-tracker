@@ -10,7 +10,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(QueryExecutor e) : super(e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {
@@ -19,7 +19,11 @@ class AppDatabase extends _$AppDatabase {
         await m.createAll();
       },
       onUpgrade: (Migrator m, int from, int to) async {
-        // Handle migrations here in future versions
+        if (from < 2) {
+          // Add isForOther and paidForPerson columns to expenses table
+          await m.addColumn(expenses, expenses.isForOther);
+          await m.addColumn(expenses, expenses.paidForPerson);
+        }
       },
     );
   }

@@ -8,6 +8,8 @@ class Expenses extends Table {
   DateTimeColumn get date => dateTime()();
   TextColumn get paymentMethod => text()();
   BoolColumn get isRecurring => boolean().withDefault(const Constant(false))();
+  BoolColumn get isForOther => boolean().withDefault(const Constant(false))();
+  TextColumn get paidForPerson => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
   BoolColumn get isSynced => boolean().withDefault(const Constant(false))();

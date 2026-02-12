@@ -18,6 +18,7 @@ import 'presentation/blocs/category/category_cubit.dart';
 import 'presentation/blocs/budget/budget_cubit.dart';
 import 'presentation/blocs/dashboard/dashboard_cubit.dart';
 import 'presentation/blocs/settings/settings_cubit.dart';
+import 'presentation/blocs/debt/debt_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -50,6 +51,9 @@ Future<void> setupDependencies() async {
   sl.registerLazySingleton(() => DeleteExpenseUseCase(sl()));
   sl.registerLazySingleton(() => GetTotalSpendingUseCase(sl()));
   sl.registerLazySingleton(() => GetCategorySpendingUseCase(sl()));
+  sl.registerLazySingleton(() => GetExpensesForOthersUseCase(sl()));
+  sl.registerLazySingleton(() => GetExpensesByPersonUseCase(sl()));
+  sl.registerLazySingleton(() => GetDebtsByPersonUseCase(sl()));
 
   // Use Cases - Category
   sl.registerLazySingleton(() => GetAllCategoriesUseCase(sl()));
@@ -107,4 +111,11 @@ Future<void> setupDependencies() async {
   );
 
   sl.registerLazySingleton(() => SettingsCubit());
+
+  sl.registerFactory(
+    () => DebtCubit(
+      getDebtsByPersonUseCase: sl(),
+      getExpensesByPersonUseCase: sl(),
+    ),
+  );
 }
