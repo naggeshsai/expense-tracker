@@ -210,6 +210,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📚 Additional Documentation
 
-- [Architecture Documentation](docs/ARCHITECTURE.md)
-- [API Documentation](docs/API.md) (Coming soon)
-- [User Guide](docs/USER_GUIDE.md) (Coming soon)
+- [Quick Start Guide](docs/QUICK_START.md) - Get started in 5 minutes
+- [Architecture Documentation](docs/ARCHITECTURE.md) - Detailed architecture and design
+- [Architecture Diagrams](docs/diagrams/ARCHITECTURE_DIAGRAMS.md) - Visual system diagrams
+- [Setup Guide](docs/SETUP.md) - Platform-specific setup instructions  
+- [User Guide](docs/USER_GUIDE.md) - Complete feature guide
+- [Project Summary](docs/PROJECT_SUMMARY.md) - Implementation status
+- [Implementation Notes](docs/IMPLEMENTATION_NOTES.md) - Technical details
+- [Contributing Guide](CONTRIBUTING.md) - How to contribute
