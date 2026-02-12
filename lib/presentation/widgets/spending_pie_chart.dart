@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../domain/entities/category.dart';
 
-class SpendingPieChart extends StatelessWidget {
+class SpendingPieChart extends StatefulWidget {
   final Map<Category, double> categorySpending;
 
   const SpendingPieChart({
@@ -11,8 +11,15 @@ class SpendingPieChart extends StatelessWidget {
   });
 
   @override
+  State<SpendingPieChart> createState() => _SpendingPieChartState();
+}
+
+class _SpendingPieChartState extends State<SpendingPieChart> {
+  int touchedIndex = -1;
+
+  @override
   Widget build(BuildContext context) {
-    if (categorySpending.isEmpty) {
+    if (widget.categorySpending.isEmpty) {
       return const Center(
         child: Text('No spending data available'),
       );
@@ -24,24 +31,44 @@ class SpendingPieChart extends StatelessWidget {
         sectionsSpace: 2,
         centerSpaceRadius: 40,
         pieTouchData: PieTouchData(
-          touchCallback: (FlTouchEvent event, pieTouchResponse) {},
+          touchCallback: (FlTouchEvent event, pieTouchResponse) {
+            setState(() {
+              if (!event.isInterestedForInteractions ||
+                  pieTouchResponse == null ||
+                  pieTouchResponse.touchedSection == null) {
+                touchedIndex = -1;
+                return;
+              }
+              touchedIndex =
+                  pieTouchResponse.touchedSection!.touchedSectionIndex;
+            });
+          },
         ),
       ),
     );
   }
 
   List<PieChartSectionData> _buildSections() {
-    final total = categorySpending.values.fold<double>(0, (sum, val) => sum + val);
+    final total = widget.categorySpending.values.fold<double>(0, (sum, val) => sum + val);
     
-    return categorySpending.entries.map((entry) {
-      final percentage = (entry.value / total * 100);
+    return widget.categorySpending.entries.toList().asMap().entries.map((entry) {
+      final index = entry.key;
+      final category = entry.value.key;
+      final value = entry.value.value;
+      final percentage = (value / total * 100);
+      final isTouched = index == touchedIndex;
+      final radius = isTouched ? 65.0 : 50.0;
+      final fontSize = isTouched ? 14.0 : 12.0;
+
       return PieChartSectionData(
-        color: Color(entry.key.color),
-        value: entry.value,
-        title: '${percentage.toStringAsFixed(1)}%',
-        radius: 50,
-        titleStyle: const TextStyle(
-          fontSize: 12,
+        color: Color(category.color),
+        value: value,
+        title: isTouched
+            ? '${category.name}\n${percentage.toStringAsFixed(1)}%'
+            : '${percentage.toStringAsFixed(1)}%',
+        radius: radius,
+        titleStyle: TextStyle(
+          fontSize: fontSize,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
