@@ -20,6 +20,17 @@ void main() {
   late MockDeleteCategoryUseCase mockDeleteCategoryUseCase;
   late MockSeedDefaultCategoriesUseCase mockSeedDefaultCategoriesUseCase;
 
+  setUpAll(() {
+    registerFallbackValue(Category(
+      id: '',
+      name: '',
+      icon: '',
+      color: 0,
+      isCustom: false,
+      createdAt: DateTime(2000),
+    ));
+  });
+
   setUp(() {
     mockGetAllCategoriesUseCase = MockGetAllCategoriesUseCase();
     mockAddCategoryUseCase = MockAddCategoryUseCase();

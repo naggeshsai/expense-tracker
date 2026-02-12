@@ -1,6 +1,5 @@
 import '../../domain/entities/expense.dart';
 import '../../domain/repositories/expense_repository.dart';
-import '../local/database.dart';
 import '../local/daos/expense_dao.dart';
 import '../models/expense_model.dart';
 

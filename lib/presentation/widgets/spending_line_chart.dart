@@ -70,7 +70,7 @@ class SpendingLineChart extends StatelessWidget {
 
   List<FlSpot> _buildSpots() {
     return monthlySpending.entries.toList().asMap().entries.map((entry) {
-      return FlSpot(entry.key.toDouble(), entry.value);
+      return FlSpot(entry.key.toDouble(), entry.value.value);
     }).toList();
   }
 }

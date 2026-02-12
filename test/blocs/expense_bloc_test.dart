@@ -23,6 +23,20 @@ void main() {
   late MockUpdateExpenseUseCase mockUpdateExpenseUseCase;
   late MockDeleteExpenseUseCase mockDeleteExpenseUseCase;
 
+  setUpAll(() {
+    registerFallbackValue(Expense(
+      id: '',
+      amount: 0,
+      categoryId: '',
+      date: DateTime(2000),
+      paymentMethod: '',
+      isRecurring: false,
+      createdAt: DateTime(2000),
+      updatedAt: DateTime(2000),
+      isSynced: false,
+    ));
+  });
+
   setUp(() {
     mockGetAllExpensesUseCase = MockGetAllExpensesUseCase();
     mockGetExpensesByDateRangeUseCase = MockGetExpensesByDateRangeUseCase();

@@ -67,7 +67,7 @@ Future<void> setupDependencies() async {
   sl.registerLazySingleton(() => DeleteBudgetUseCase(sl()));
 
   // BLoCs/Cubits
-  sl.registerFactory(
+  sl.registerLazySingleton(
     () => ExpenseBloc(
       getAllExpensesUseCase: sl(),
       getExpensesByDateRangeUseCase: sl(),
@@ -105,5 +105,5 @@ Future<void> setupDependencies() async {
     ),
   );
 
-  sl.registerFactory(() => SettingsCubit());
+  sl.registerLazySingleton(() => SettingsCubit());
 }

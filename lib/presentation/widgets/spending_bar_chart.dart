@@ -65,7 +65,7 @@ class SpendingBarChart extends StatelessWidget {
         x: entry.key,
         barRods: [
           BarChartRodData(
-            toY: entry.value,
+            toY: entry.value.value,
             color: Colors.blue,
             width: 16,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
