@@ -199,12 +199,10 @@ class SettingsPage extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              // TODO: Implement clear data
               Navigator.of(dialogContext).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('All data cleared'),
-                  backgroundColor: Colors.red,
+                  content: Text('Clear all data feature coming soon!'),
                 ),
               );
             },

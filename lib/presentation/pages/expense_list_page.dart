@@ -116,10 +116,14 @@ class ExpenseListPage extends StatelessWidget {
                       itemCount: expenseState.expenses.length,
                       itemBuilder: (context, index) {
                         final expense = expenseState.expenses[index];
-                        final category = categories.firstWhere(
-                          (c) => c.id == expense.categoryId,
-                          orElse: () => null,
-                        );
+                        Category? category;
+                        try {
+                          category = categories.firstWhere(
+                            (c) => c.id == expense.categoryId,
+                          );
+                        } catch (e) {
+                          category = null;
+                        }
 
                         return ExpenseCard(
                           expense: expense,

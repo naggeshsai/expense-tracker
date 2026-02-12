@@ -133,13 +133,13 @@ class DashboardPage extends StatelessWidget {
   ) {
     final result = <dynamic, double>{};
     for (final entry in spending.entries) {
-      final category = categories.firstWhere(
-        (c) => c.id == entry.key,
-        orElse: () => null,
-      );
-      if (category != null) {
-        result[category] = entry.value;
+      dynamic category;
+      try {
+        category = categories.firstWhere((c) => c.id == entry.key);
+      } catch (e) {
+        continue; // Skip if category not found
       }
+      result[category] = entry.value;
     }
     return result;
   }
@@ -153,12 +153,12 @@ class DashboardPage extends StatelessWidget {
       ..sort((a, b) => b.value.compareTo(a.value));
 
     return sortedEntries.map((entry) {
-      final category = categories.firstWhere(
-        (c) => c.id == entry.key,
-        orElse: () => null,
-      );
-
-      if (category == null) return const SizedBox.shrink();
+      dynamic category;
+      try {
+        category = categories.firstWhere((c) => c.id == entry.key);
+      } catch (e) {
+        return const SizedBox.shrink(); // Skip if not found
+      }
 
       return Card(
         margin: const EdgeInsets.only(bottom: 8),

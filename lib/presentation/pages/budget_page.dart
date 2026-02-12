@@ -74,12 +74,17 @@ class BudgetPage extends StatelessWidget {
                     itemCount: budgetState.budgets.length,
                     itemBuilder: (context, index) {
                       final budget = budgetState.budgets[index];
-                      final category = budget.categoryId != null
-                          ? categories.firstWhere(
-                              (c) => c.id == budget.categoryId,
-                              orElse: () => null,
-                            )
-                          : null;
+                      dynamic category;
+                      
+                      if (budget.categoryId != null) {
+                        try {
+                          category = categories.firstWhere(
+                            (c) => c.id == budget.categoryId,
+                          );
+                        } catch (e) {
+                          category = null;
+                        }
+                      }
 
                       final categoryName = category?.name ?? 'Overall Budget';
 
