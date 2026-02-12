@@ -181,6 +181,28 @@ flutter test --coverage
 - `created_at` (DATETIME) - Creation timestamp
 - `updated_at` (DATETIME) - Update timestamp
 
+## 🚀 CI/CD — Automated Releases
+
+Every merge to `main` automatically:
+1. **Determines the next version** from conventional commit messages (`feat:` → minor, `fix:` → patch, breaking → major)
+2. **Builds an Android APK** (release-signed if secrets are configured, debug-signed otherwise)
+3. **Builds a Windows installer** (.exe via Inno Setup)
+4. **Creates a GitHub Release** with both artifacts and auto-generated release notes
+5. **Tags the release** and bumps the version in `pubspec.yaml`
+
+### Required GitHub Secrets (for APK release signing)
+
+| Secret | Description |
+|--------|-------------|
+| `KEYSTORE_BASE64` | Base64-encoded `.jks` keystore file |
+| `KEYSTORE_PASSWORD` | Keystore password |
+| `KEY_PASSWORD` | Key password |
+| `KEY_ALIAS` | Key alias name |
+
+To encode your keystore: `base64 -i release-keystore.jks | pbcopy`
+
+> **Note:** If signing secrets are not configured, the APK will be built with debug signing — functional but not suitable for Play Store distribution.
+
 ## 🎨 Screenshots
 
 > Screenshots will be added after the app is built and tested

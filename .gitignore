@@ -48,6 +48,9 @@ app.*.map.json
 *.freezed.dart
 *.gr.dart
 
+# Installer output
+installers/windows/Output/
+
 # Coverage
 coverage/
 

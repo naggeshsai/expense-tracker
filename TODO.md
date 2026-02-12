@@ -38,3 +38,7 @@
 - [ ] **Multi-device support**: Sync data across devices
 - [ ] **Backup and restore**: Cloud-based backup and restore
 - [ ] **Conflict resolution**: Handle merge conflicts when syncing from multiple devices
+
+## Completed — CI/CD
+
+- [x] **Automated release pipeline**: GitHub Actions workflow builds APK + Windows installer and creates a GitHub Release with auto-versioning on every merge to `main`
