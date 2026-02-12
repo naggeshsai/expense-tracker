@@ -251,13 +251,26 @@ class _AddExpensePageState extends State<AddExpensePage> {
         isSynced: false,
       );
 
+      final bloc = sl<ExpenseBloc>();
       if (widget.expense == null) {
-        context.read<ExpenseBloc>().add(AddExpense(expense));
+        bloc.add(AddExpense(expense));
       } else {
-        context.read<ExpenseBloc>().add(UpdateExpense(expense));
+        bloc.add(UpdateExpense(expense));
       }
 
-      Navigator.of(context).pop();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              widget.expense == null
+                  ? 'Expense added successfully'
+                  : 'Expense updated successfully',
+            ),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        Navigator.of(context).pop();
+      }
     }
   }
 

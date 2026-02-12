@@ -410,3 +410,36 @@ The remaining work is straightforward implementation of features for which the s
 
 **Status**: ✅ **Production-Ready Foundation**
 **Next Step**: Run `flutter create` and complete remaining UI features
+
+## Bug Fixes Applied
+
+### Fix: ProviderNotFoundException in AddExpensePage (Feb 2026)
+
+**Problem**: Tapping "Add Expense" or "Update Expense" on `AddExpensePage` threw
+`ProviderNotFoundException: Could not find the correct Provider<ExpenseBloc>`.
+
+**Root Cause**: `_saveExpense()` used `context.read<ExpenseBloc>()` where `context`
+is the `State`'s `BuildContext` — which is the **parent** of the `MultiBlocProvider`
+returned by `build()`. Since the `MultiBlocProvider` wrapping the `Scaffold` is a
+**child** of the widget's own context, the provider was below the lookup context in
+the widget tree and could not be found.
+
+**Fix**: Replaced `context.read<ExpenseBloc>()` with `sl<ExpenseBloc>()` (direct
+service locator access). Since `ExpenseBloc` is registered as a singleton in GetIt,
+this is safe and avoids the `BuildContext` ancestor issue entirely. Also added
+SnackBar confirmation feedback on successful add/update for consistency with the
+rest of the app.
+
+**File Changed**: `lib/presentation/pages/add_expense_page.dart`
+
+**Test Added**: `test/widgets/add_expense_page_test.dart` — 3 widget tests:
+1. Saves expense using service locator without ProviderNotFoundException
+2. Shows "Expense added successfully" SnackBar on add
+3. Shows "Expense updated successfully" SnackBar on edit
+
+**Lesson**: When a `StatefulWidget`'s `build()` method returns a `BlocProvider`/
+`MultiBlocProvider`, the `State`'s `context` is an **ancestor** of that provider.
+Use `Builder` for a child context, or access singletons via the service locator
+directly to avoid `ProviderNotFoundException` in callbacks like `onPressed`.
+
+**Platforms Verified**: Android (APK), Web, Windows — all build successfully.
