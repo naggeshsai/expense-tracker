@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'data/local/database.dart';
+import 'data/local/connection/connection.dart';
 import 'data/local/daos/expense_dao.dart';
 import 'data/local/daos/category_dao.dart';
 import 'data/local/daos/budget_dao.dart';
@@ -22,7 +23,7 @@ final sl = GetIt.instance;
 
 Future<void> setupDependencies() async {
   // Database
-  sl.registerLazySingleton<AppDatabase>(() => AppDatabase());
+  sl.registerLazySingleton<AppDatabase>(() => constructDb());
 
   // DAOs
   sl.registerLazySingleton<ExpenseDao>(() => ExpenseDao(sl()));
