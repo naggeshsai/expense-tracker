@@ -14,6 +14,14 @@ A complete cross-platform expense tracking application built with Flutter that r
 - ✅ Mark expenses as recurring
 - ✅ Filter expenses by date range and category
 - ✅ Rich note-taking for each expense
+- ✅ Mark expenses as "paid for someone else" to track debts
+
+### Debt Tracking
+- ✅ Toggle "Paid for someone else" when adding an expense
+- ✅ Enter the person’s name to track who owes you
+- ✅ Debts overview page with total owed and per-person breakdown
+- ✅ Drill into each person to see expense-by-expense details
+- ✅ Color-coded avatars and sorted by amount owed
 
 ### Category Management
 - ✅ 10 pre-defined categories with icons and colors
@@ -150,6 +158,8 @@ flutter test --coverage
 - `date` (DATETIME) - Transaction date
 - `payment_method` (TEXT) - Payment method used
 - `is_recurring` (BOOLEAN) - Recurring flag
+- `is_for_other` (BOOLEAN) - Paid for someone else flag
+- `paid_for_person` (TEXT, NULLABLE) - Name of person this was paid for
 - `created_at` (DATETIME) - Creation timestamp
 - `updated_at` (DATETIME) - Update timestamp
 - `is_synced` (BOOLEAN) - Sync status (for Phase 2)

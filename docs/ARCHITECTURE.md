@@ -40,16 +40,16 @@ The application follows **Clean Architecture** with three main layers:
 │                      PRESENTATION LAYER                         │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐      │
-│  │Dashboard │  │ Expenses │  │  Budget  │  │ Settings │      │
-│  │   Page   │  │   Page   │  │   Page   │  │   Page   │      │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘      │
-│       │             │              │              │            │
-│  ┌────▼─────────────▼──────────────▼──────────────▼─────┐     │
-│  │                  BLoC / Cubit                         │     │
-│  │  - ExpenseBloc  - CategoryCubit  - BudgetCubit       │     │
-│  │  - DashboardCubit  - SettingsCubit                   │     │
-│  └────────────────────┬──────────────────────────────────┘     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐│
+│  │Dashboard │  │ Expenses │  │  Budget  │  │  Debts   │  │ Settings ││
+│  │   Page   │  │   Page   │  │   Page   │  │   Page   │  │   Page   ││
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘│
+│       │             │              │              │              │     │
+│  ┌────▼─────────────▼──────────────▼──────────────▼──────────────▼┐    │
+│  │                  BLoC / Cubit                                  │    │
+│  │  - ExpenseBloc  - CategoryCubit  - BudgetCubit                │    │
+│  │  - DashboardCubit  - SettingsCubit  - DebtCubit               │    │
+│  └────────────────────┬───────────────────────────────────────────┘    │
 │                       │                                        │
 └───────────────────────┼────────────────────────────────────────┘
                         │
@@ -63,6 +63,8 @@ The application follows **Clean Architecture** with three main layers:
 │  │  - GetAllCategories  - AddCategory                  │     │
 │  │  - GetAllBudgets     - AddBudget                    │     │
 │  │  - GetTotalSpending  - GetCategorySpending         │     │
+│  │  - GetDebtsByPerson  - GetExpensesByPerson          │     │
+│  │  - GetExpensesForOthers                             │     │
 │  └────────────────────┬─────────────────────────────────┘     │
 │                       │                                        │
 │  ┌────────────────────▼─────────────────────────────────┐     │
@@ -74,7 +76,7 @@ The application follows **Clean Architecture** with three main layers:
 │                       │                                        │
 │  ┌────────────────────▼─────────────────────────────────┐     │
 │  │                  Entities                            │     │
-│  │  - Expense  - Category  - Budget                    │     │
+│  │  - Expense  - Category  - Budget  - PersonDebt      │     │
 │  └──────────────────────────────────────────────────────┘     │
 │                                                                │
 └───────────────────────┬────────────────────────────────────────┘
@@ -205,6 +207,38 @@ User              BudgetPage         BudgetCubit        Repository        Databa
   │                   │                   │                 │                │
 ```
 
+### 4. Debt Tracking Flow
+
+```
+User              DebtsPage           DebtCubit          Repository        Database
+  │                   │                   │                 │                │
+  ├──Opens Debts─────>│                   │                 │                │
+  │                   │                   │                 │                │
+  │                   ├──loadDebts()─────>│                 │                │
+  │                   │                   │                 │                │
+  │                   │                   ├──getDebtsByPerson()───>│         │
+  │                   │                   │                 │                │
+  │                   │                   │                 ├──SELECT───────>│
+  │                   │                   │                 │  SUM(amount)   │
+  │                   │                   │                 │  GROUP BY      │
+  │                   │                   │                 │  person        │
+  │                   │                   │                 │<──Map──────────┤
+  │                   │                   │                 │                │
+  │                   │                   │<──PersonDebts──┤                │
+  │                   │                   │                 │                │
+  │                   │<──DebtLoaded──────┤                 │                │
+  │                   │                   │                 │                │
+  │<──Shows Total &───┤                   │                 │                │
+  │   Person List     │                   │                 │                │
+  │                   │                   │                 │                │
+  ├──Taps Person─────>│                   │                 │                │
+  │                   │                   │                 │                │
+  │             ┌─────▼──────────┐        │                 │                │
+  │             │PersonDebtDetail│        │                 │                │
+  │             │     Page       │        │                 │                │
+  │             └────────────────┘        │                 │                │
+```
+
 ## Database Schema
 
 ### Expenses Table
@@ -217,6 +251,8 @@ CREATE TABLE expenses (
   date DATETIME NOT NULL,
   payment_method TEXT NOT NULL,
   is_recurring BOOLEAN DEFAULT 0,
+  is_for_other BOOLEAN DEFAULT 0,
+  paid_for_person TEXT,
   created_at DATETIME NOT NULL,
   updated_at DATETIME NOT NULL,
   is_synced BOOLEAN DEFAULT 0,
@@ -257,7 +293,7 @@ CREATE TABLE budgets (
 - **States**: Different states of the UI
 - **Bloc**: Business logic that transforms events into states
 
-### Cubit Pattern (for Categories, Budget, Settings)
+### Cubit Pattern (for Categories, Budget, Settings, Debts)
 - Simplified version of BLoC
 - Direct method calls instead of events
 - Better for simpler state management

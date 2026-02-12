@@ -4,10 +4,11 @@
 1. [Getting Started](#getting-started)
 2. [Dashboard](#dashboard)
 3. [Managing Expenses](#managing-expenses)
-4. [Budget Tracking](#budget-tracking)
-5. [Categories](#categories)
-6. [Settings](#settings)
-7. [Tips & Best Practices](#tips--best-practices)
+4. [Debt Tracking](#debt-tracking)
+5. [Budget Tracking](#budget-tracking)
+6. [Categories](#categories)
+7. [Settings](#settings)
+8. [Tips & Best Practices](#tips--best-practices)
 
 ## Getting Started
 
@@ -18,10 +19,11 @@ When you first launch the Expense Tracker app:
 3. Tap the **+** (floating action button) to add your first expense
 
 ### Navigation
-The app uses bottom navigation with four main sections:
+The app uses bottom navigation with five main sections:
 - **Dashboard**: View spending analytics and charts
 - **Expenses**: List and manage all expenses
 - **Budget**: Set and track budgets
+- **Debts**: See who owes you money
 - **Settings**: Configure app preferences
 
 ## Dashboard
@@ -82,6 +84,16 @@ The Dashboard provides a comprehensive view of your financial activity.
 
 3. **Save**: Tap "Add Expense" button
 
+### Paying for Someone Else
+
+When you pay for someone else, you can track the debt:
+
+1. **Toggle "Paid for someone else"** switch while adding an expense
+2. **Enter the person's name** in the field that appears
+3. **Save** the expense as usual
+4. The expense is recorded normally and also tracked as a debt
+5. View all debts in the **Debts** tab
+
 ### Viewing Expenses
 
 1. Navigate to **Expenses** tab
@@ -116,6 +128,51 @@ If no expenses exist:
 - Friendly message displayed
 - Instructions to add first expense
 - Tap + to get started
+
+## Debt Tracking
+
+### Overview
+The Debt Tracking feature helps you keep track of money others owe you. When you pay for someone else’s meal, ticket, or any expense, you can mark it so the app tracks the debt.
+
+### Marking an Expense as "Paid for Someone Else"
+
+1. **Add a new expense** or **edit an existing one**
+2. **Toggle** the "Paid for someone else" switch
+3. **Enter the person's name** (required when switch is on)
+4. **Save** the expense
+
+The expense is added to your normal expense list and also tracked under that person’s debt.
+
+### Viewing Debts
+
+1. Navigate to the **Debts** tab (people icon in bottom navigation)
+2. See the **Total Owed to You** summary card at the top
+3. Below, a list of each person who owes you money
+4. Each entry shows:
+   - Person’s avatar (first letter of name)
+   - Person’s name
+   - Total amount owed (in red)
+
+### Viewing Debt Details
+
+1. **Tap on a person’s name** in the Debts tab
+2. See an expense-by-expense breakdown
+3. Each entry shows:
+   - Category icon and name
+   - Expense date
+   - Amount
+4. Header card shows the total owed by that person
+
+### Tips for Debt Tracking
+
+✅ **Do:**
+- Record debt expenses immediately
+- Use consistent spelling for person names (e.g., always "Alice", not "alice" or "Alice S.")
+- Check the Debts tab regularly to settle up
+
+❌ **Don't:**
+- Forget to toggle the switch before saving
+- Use different names for the same person (debts won’t aggregate correctly)
 
 ## Budget Tracking
 
@@ -341,6 +398,9 @@ The app supports:
 - Keyboard navigation (desktop)
 
 ## Frequently Asked Questions
+
+**Q: Can I track money others owe me?**
+A: Yes! When adding an expense, toggle "Paid for someone else", enter the person’s name, and view all debts in the Debts tab.
 
 **Q: Can I track income?**
 A: Currently, the app focuses on expenses. Income tracking may be added in future updates.

@@ -10,15 +10,16 @@
                                │
 ┌──────────────────────────────▼──────────────────────────────────────┐
 │                      PRESENTATION LAYER                             │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐  │
-│  │ Dashboard  │  │  Expenses  │  │   Budget   │  │  Settings  │  │
-│  │    Page    │  │    Page    │  │    Page    │  │    Page    │  │
-│  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘  │
-│        └────────────────┴────────────────┴────────────────┘         │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐  │
+│  │ Dashboard  │  │  Expenses  │  │   Budget   │  │   Debts    │  │  Settings  │  │
+│  │    Page    │  │    Page    │  │    Page    │  │    Page    │  │    Page    │  │
+│  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘  │
+│        └──────────────┴───────────────┴──────────────┴──────────────┴┘         │
 │                               │                                     │
-│  ┌────────────────────────────▼───────────────────────────────┐    │
+│  ┌────────────────────────────▼─────────────────────────────┐    │
 │  │              State Management (BLoC/Cubit)                 │    │
 │  │   ExpenseBloc │ CategoryCubit │ BudgetCubit │ SettingsCubit│   │
+│  │   DashboardCubit │ DebtCubit                              │   │
 │  └────────────────────────────┬───────────────────────────────┘    │
 └───────────────────────────────┼────────────────────────────────────┘
                                 │
@@ -32,6 +33,8 @@
 │  │  • Get/Add/Update/Delete Budgets                            │  │
 │  │  • Calculate Total Spending                                 │  │
 │  │  • Get Category-wise Spending                               │  │
+│  │  • Get Debts by Person / Expenses by Person                 │  │
+│  │  • Get Expenses for Others                                  │  │
 │  └──────────────────────────┬──────────────────────────────────┘  │
 │                             │                                      │
 │  ┌──────────────────────────▼──────────────────────────────────┐  │
@@ -41,7 +44,7 @@
 │                             │                                      │
 │  ┌──────────────────────────▼──────────────────────────────────┐  │
 │  │                      Entities                               │  │
-│  │     Expense    │    Category    │    Budget                 │  │
+│  │     Expense    │    Category    │    Budget    │ PersonDebt │  │
 │  └─────────────────────────────────────────────────────────────┘  │
 └───────────────────────────────┬────────────────────────────────────┘
                                 │
@@ -225,7 +228,9 @@ User Action
 │ • date             │              │ • year             │    │
 │ • payment_method   │              │ • created_at       │    │
 │ • is_recurring     │              │ • updated_at       │    │
-│ • created_at       │              └────────────────────┘    │
+│ • is_for_other     │              └────────────────────┘    │
+│ • paid_for_person  │                                        │
+│ • created_at       │                                        │
 │ • updated_at       │                                        │
 │ • is_synced        │                                        │
 └────────────────────┘                                        │
@@ -251,22 +256,22 @@ User Action
                     │ Home Page  │
                     └──────┬─────┘
                            │
-        ┌──────────────────┼─────────────────┐
-        │                  │                 │
-        ▼                  ▼                 ▼
-┌──────────────┐   ┌──────────────┐  ┌──────────────┐
-│  Dashboard   │   │   Expenses   │  │    Budget    │
-│              │   │              │  │              │
-│  • Charts    │   │ • List View  │  │ • Progress   │
-│  • Analytics │   │ • Add/Edit   │  │   Bars       │
-│  • Summary   │   │ • Delete     │  │ • Set Budget │
-└──────────────┘   └──────────────┘  └──────────────┘
-        │                  │
-        │                  ▼
-        │          ┌──────────────┐
-        │          │ Add Expense  │
-        │          │    Page      │
-        │          └──────────────┘
+        ┌─────────┬─────────┼─────────┬─────────┐
+        │         │         │         │         │
+        ▼         ▼         ▼         ▼         ▼
+┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+│  Dashboard   │ │   Expenses   │ │    Budget    │ │    Debts     │ │   Settings   │
+│              │ │              │ │              │ │              │ │              │
+│  • Charts    │ │ • List View  │ │ • Progress   │ │ • Total Owed │ │ • Theme      │
+│  • Analytics │ │ • Add/Edit   │ │   Bars       │ │ • Per Person │ │ • Currency   │
+│  • Summary   │ │ • Delete     │ │ • Set Budget │ │ • Details    │ │ • Export     │
+└──────────────┘ └──────────────┘ └──────────────┘ └─────┬────────┘ └──────────────┘
+        │                  │                              │
+        │                  ▼                              ▼
+        │          ┌──────────────┐                ┌──────────────┐
+        │          │ Add Expense  │                │ Person Debt  │
+        │          │    Page      │                │ Detail Page  │
+        │          └──────────────┘                └──────────────┘
         │
         ▼
 ┌──────────────┐
@@ -291,7 +296,13 @@ User Action
 │   ├── Edit Expense
 │   ├── Delete Expense
 │   ├── View Expenses
-│   └── Filter Expenses
+│   ├── Filter Expenses
+│   └── Mark as "Paid for Someone Else"
+│
+├── Debt Tracking
+│   ├── View Total Owed
+│   ├── View Per-Person Debts
+│   └── View Person Expense Details
 │
 ├── Category Management
 │   ├── View Categories

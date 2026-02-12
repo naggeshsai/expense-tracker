@@ -36,12 +36,17 @@ That's it! The app should now be running on your device/emulator.
    - Enter amount and select category
    - Tap "Add Expense"
 
-3. **View your dashboard:**
+3. **Track debts (paid for someone else):**
+   - While adding an expense, toggle **"Paid for someone else"**
+   - Enter the person's name
+   - View all debts in the **Debts** tab
+
+4. **View your dashboard:**
    - See spending breakdown by category
    - View charts and analytics
    - Filter by date range
 
-4. **Set a budget:**
+5. **Set a budget:**
    - Go to Budget tab
    - Tap **+** to add a budget
    - Monitor your spending
@@ -113,7 +118,8 @@ flutter run -d windows             # Runs as Windows app
 
 ### Next Steps
 
-- 📖 Read the [User Guide](USER_GUIDE.md) to learn all features
+- � Use the [Debts tab](USER_GUIDE.md#debt-tracking) to track who owes you
+- �📖 Read the [User Guide](USER_GUIDE.md) to learn all features
 - 🏗️ Check [Architecture Documentation](ARCHITECTURE.md) to understand the code
 - 🛠️ See [Setup Guide](SETUP.md) for detailed platform setup
 - 🤝 Read [Contributing Guide](../CONTRIBUTING.md) to contribute

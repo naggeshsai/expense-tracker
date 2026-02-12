@@ -58,16 +58,16 @@ expense-tracker/
 │   │       └── budget_repository_impl.dart   ✅ Implementation
 │   │
 │   ├── domain/
-│   │   ├── entities/
-│   │   │   ├── expense.dart           ✅ Expense entity
+│   │   │   ├── expense.dart           ✅ Expense entity (with debt fields)
 │   │   │   ├── category.dart          ✅ Category entity
-│   │   │   └── budget.dart            ✅ Budget entity
+│   │   │   ├── budget.dart            ✅ Budget entity
+│   │   │   └── person_debt.dart       ✅ PersonDebt entity
 │   │   ├── repositories/
 │   │   │   ├── expense_repository.dart  ✅ Interface
 │   │   │   ├── category_repository.dart ✅ Interface
 │   │   │   └── budget_repository.dart   ✅ Interface
 │   │   └── usecases/
-│   │       ├── expense_usecases.dart    ✅ 8 use cases
+│   │       ├── expense_usecases.dart    ✅ 11 use cases
 │   │       ├── category_usecases.dart   ✅ 6 use cases
 │   │       └── budget_usecases.dart     ✅ 6 use cases
 │   │
@@ -83,6 +83,9 @@ expense-tracker/
 │       │   ├── budget/
 │       │   │   ├── budget_cubit.dart    ✅ Cubit
 │       │   │   └── budget_state.dart    ✅ 4 states
+│       │   ├── debt/
+│       │   │   ├── debt_cubit.dart      ✅ Cubit
+│       │   │   └── debt_state.dart      ✅ 5 states
 │       │   ├── dashboard/
 │       │   │   ├── dashboard_cubit.dart ✅ Cubit
 │       │   │   └── dashboard_state.dart ✅ State with data
@@ -90,12 +93,14 @@ expense-tracker/
 │       │       ├── settings_cubit.dart  ✅ Cubit
 │       │       └── settings_state.dart  ✅ Theme/currency state
 │       ├── pages/
-│       │   ├── home_page.dart           ✅ Bottom nav
+│       │   ├── home_page.dart           ✅ Bottom nav (5 tabs)
 │       │   ├── dashboard_page.dart      ✅ Analytics
 │       │   ├── expense_list_page.dart   ✅ List + CRUD
-│       │   ├── add_expense_page.dart    ✅ Form
+│       │   ├── add_expense_page.dart    ✅ Form (with debt toggle)
 │       │   ├── category_page.dart       ✅ Management
 │       │   ├── budget_page.dart         ✅ Tracking
+│       │   ├── debts_page.dart          ✅ Debt overview
+│       │   ├── person_debt_detail_page.dart ✅ Per-person detail
 │       │   └── settings_page.dart       ✅ Configuration
 │       └── widgets/
 │           ├── expense_card.dart        ✅ List item
@@ -108,9 +113,14 @@ expense-tracker/
 │           └── spending_line_chart.dart ✅ Line chart
 │
 ├── test/
-│   └── blocs/
-│       ├── expense_bloc_test.dart       ✅ BLoC tests
-│       └── category_cubit_test.dart     ✅ Cubit tests
+│   ├── blocs/
+│   │   ├── expense_bloc_test.dart       ✅ BLoC tests (11 tests)
+│   │   ├── category_cubit_test.dart     ✅ Cubit tests
+│   │   └── debt_cubit_test.dart         ✅ Debt cubit tests (10 tests)
+│   └── widgets/
+│       ├── add_expense_page_test.dart   ✅ Widget tests (10 tests)
+│       ├── currency_propagation_test.dart ✅ Currency tests (12 tests)
+│       └── debts_page_test.dart         ✅ Debts page tests (8 tests)
 │
 └── docs/
     ├── README.md                        ✅ Docs index

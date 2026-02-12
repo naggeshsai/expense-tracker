@@ -80,7 +80,7 @@ The app follows Clean Architecture with three layers:
 
 ### State Management
 - **BLoC**: For complex state (Expenses)
-- **Cubit**: For simpler state (Categories, Budget, Settings)
+- **Cubit**: For simpler state (Categories, Budget, Settings, Debts)
 
 ### Database
 - **Drift**: Type-safe SQLite wrapper

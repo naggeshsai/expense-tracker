@@ -22,6 +22,7 @@
 - DAOs for each table with CRUD operations
 - Relationships between tables
 - UUID for primary keys (ready for future sync)
+- Schema versioning with migration support (v1 → v2)
 
 #### 4. Dependency Injection ✅
 - **GetIt** for DI container
@@ -32,15 +33,17 @@
 #### 5. User Interface ✅
 - **Material Design 3** theming
 - **Dark/Light mode** support
-- **Bottom navigation** for mobile
+- **Bottom navigation** with 5 tabs
 - Responsive layouts
 - **Pages**:
   - Dashboard with analytics
   - Expense list and management
   - Budget tracking
+  - Debt tracking (who owes you)
   - Settings
-  - Add/Edit expense
+  - Add/Edit expense (with "paid for someone else" option)
   - Category management
+  - Person debt detail
 
 #### 6. Widgets ✅
 - ExpenseCard
@@ -66,6 +69,10 @@
 - ✅ Theme toggle (Light/Dark)
 - ✅ Currency selection
 - ✅ Recurring expense flag
+- ✅ "Paid for someone else" debt tracking
+- ✅ Debts overview page (total owed + per-person list)
+- ✅ Person debt detail page (expense breakdown)
+- ✅ Currency symbol propagation across all pages
 
 #### 8. Documentation ✅
 - README with features and badges
@@ -79,10 +86,15 @@
 - Flow diagrams for key features
 
 #### 9. Testing ✅
-- Unit tests for ExpenseBloc
+- Unit tests for ExpenseBloc (11 tests)
 - Unit tests for CategoryCubit
-- Test structure in place
+- Unit tests for DebtCubit (10 tests)
+- Widget tests for AddExpensePage (10 tests)
+- Widget tests for DebtsPage (8 tests)
+- Widget tests for currency propagation (12 tests)
+- 65 total tests, all passing
 - Mocktail for mocking
+- bloc_test for BLoC/Cubit testing
 
 ## ⚠️ Known Limitations
 
@@ -371,16 +383,17 @@ Additional needed:
 
 ## 📊 Code Metrics
 
-- **Total Dart Files**: ~60
-- **Lines of Code**: ~10,000+
-- **Test Files**: 2
+- **Total Dart Files**: ~65
+- **Lines of Code**: ~12,000+
+- **Test Files**: 6
 - **Documentation Files**: 8
 - **Architecture Layers**: 3 (Presentation, Domain, Data)
-- **Pages**: 7
+- **Pages**: 9
 - **Widgets**: 8
-- **BLoCs/Cubits**: 5
-- **Use Cases**: 20+
+- **BLoCs/Cubits**: 6
+- **Use Cases**: 23+
 - **Repositories**: 3
+- **Total Tests**: 65
 
 ## 🎓 Learning Resources
 
