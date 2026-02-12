@@ -19,7 +19,10 @@ flutter pub get
 # 3. Generate database code
 flutter pub run build_runner build --delete-conflicting-outputs
 
-# 4. Run the app
+# 4. Generate platform support files (required after cloning)
+flutter create . --platforms android,web,windows
+
+# 5. Run the app
 flutter run
 ```
 

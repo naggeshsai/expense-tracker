@@ -10,8 +10,8 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<SettingsCubit>(),
+    return BlocProvider.value(
+      value: sl<SettingsCubit>(),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Settings'),
@@ -119,6 +119,9 @@ class SettingsPage extends StatelessWidget {
               onChanged: (value) {
                 context.read<SettingsCubit>().setThemeMode(value!);
                 Navigator.of(dialogContext).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Theme changed to Light')),
+                );
               },
             ),
             RadioListTile<ThemeMode>(
@@ -128,6 +131,9 @@ class SettingsPage extends StatelessWidget {
               onChanged: (value) {
                 context.read<SettingsCubit>().setThemeMode(value!);
                 Navigator.of(dialogContext).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Theme changed to Dark')),
+                );
               },
             ),
             RadioListTile<ThemeMode>(
@@ -137,6 +143,9 @@ class SettingsPage extends StatelessWidget {
               onChanged: (value) {
                 context.read<SettingsCubit>().setThemeMode(value!);
                 Navigator.of(dialogContext).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Theme changed to System Default')),
+                );
               },
             ),
           ],
@@ -168,6 +177,9 @@ class SettingsPage extends StatelessWidget {
               onChanged: (value) {
                 context.read<SettingsCubit>().setCurrency(value!, entry.value);
                 Navigator.of(dialogContext).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Currency changed to $value (${entry.value})')),
+                );
               },
             );
           }).toList(),

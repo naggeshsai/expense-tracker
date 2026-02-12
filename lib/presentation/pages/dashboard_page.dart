@@ -8,6 +8,7 @@ import '../widgets/summary_card.dart';
 import '../widgets/spending_pie_chart.dart';
 import '../widgets/date_range_selector.dart';
 import '../../core/utils/currency_formatter.dart';
+import '../../domain/entities/category.dart';
 import '../../injection_container.dart';
 import 'add_expense_page.dart';
 
@@ -127,15 +128,15 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  Map<dynamic, double> _mapCategorySpending(
+  Map<Category, double> _mapCategorySpending(
     Map<String, double> spending,
     List<dynamic> categories,
   ) {
-    final result = <dynamic, double>{};
+    final result = <Category, double>{};
     for (final entry in spending.entries) {
-      dynamic category;
+      Category? category;
       try {
-        category = categories.firstWhere((c) => c.id == entry.key);
+        category = categories.firstWhere((c) => c.id == entry.key) as Category;
       } catch (e) {
         continue; // Skip if category not found
       }

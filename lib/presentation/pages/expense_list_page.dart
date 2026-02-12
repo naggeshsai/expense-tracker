@@ -6,6 +6,7 @@ import '../blocs/expense/expense_state.dart';
 import '../blocs/category/category_cubit.dart';
 import '../blocs/category/category_state.dart';
 import '../widgets/expense_card.dart';
+import '../../domain/entities/category.dart';
 import '../../injection_container.dart';
 import 'add_expense_page.dart';
 
@@ -16,8 +17,8 @@ class ExpenseListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (_) => sl<ExpenseBloc>()..add(LoadExpenses()),
+        BlocProvider.value(
+          value: sl<ExpenseBloc>()..add(LoadExpenses()),
         ),
         BlocProvider(
           create: (_) => sl<CategoryCubit>()..loadCategories(),
